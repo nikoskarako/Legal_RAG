@@ -18,10 +18,12 @@ question bank, four retrieval systems, and RAGAS scoring across all of them.
 
 | System | Retrieval | Faithfulness | Answer Relevancy | Context Relevance |
 |---|---|---|---|---|
-| Baseline | none (closed-book) | 0.116 | 0.800 | 0.814 |
+| Baseline | none (closed-book) | 0.116 | 0.800 | n/a |
 | Dense | pgvector, `multilingual-e5-base` | 0.659 | 0.711 | 0.816 |
 | BM25 | PostgreSQL `tsvector`, Greek config | **0.805** | 0.605 | 0.691 |
 | **Hybrid** | Reciprocal Rank Fusion of both | 0.799 | **0.875** | **0.932** |
+
+<sub>Context Relevance does not apply to the closed-book baseline, which retrieves nothing.</sub>
 
 Reproduce the table from the committed scores — no API keys or database needed:
 
