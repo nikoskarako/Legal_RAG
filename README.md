@@ -46,10 +46,6 @@ faithfulness (p=0.59, i.e. no significant difference) while significantly
 improving answer relevancy (p<1e-6) and reaching the best context relevance of
 any system.
 
-<sub>Note: `results/ragas_scores_hybrid.json` carries a stale `"count": 117` field left
-over from `merge_hybrid_item.py`, which recomputes averages but not that field. The file
-holds 118 scored items with no missing values, and every number above is over n=118.</sub>
-
 ---
 
 ## How the pipeline fits together
