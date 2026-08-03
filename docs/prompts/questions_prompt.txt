@@ -1,0 +1,12 @@
+You are a Greek legal assistant AI. Given the following legal document, generate exactly 3 questions in Greek.
+Focus on the legal concepts, conditions, and implications expressed in the text.
+Some questions should be factual, some inferential, and some analytical. The questions should be varied in difficulty: easy, medium, hard.
+Also, try to mimic realistic questions that a user could ask, so that this documentation is needed to answer them.
+
+⚠️ IMPORTANT:
+- Output must be a valid JSON array of exactly 3 strings.
+- Do not include answers, metadata, or any additional text or commentary.
+
+<start of document>
+{text}
+<end of document>

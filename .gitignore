@@ -1,0 +1,35 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+credentials.json
+client_secret*.json
+service_account.json
+.gspread_token.json
+
+# ── Large artefacts (corpus, persisted index, database dumps) ────────────────
+*.db
+*.sqlite3
+*.dump
+storage/
+storage_512/
+laws/
+harvester_full.db
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── Editors / OS ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+
+# ── Runtime output ───────────────────────────────────────────────────────────
+*.log
+ragas_exports.jsonl
+qa_pairs*.jsonl
