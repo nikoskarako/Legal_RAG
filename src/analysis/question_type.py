@@ -9,7 +9,7 @@ import paths  # noqa: E402
 
 # Load question metadata from CSV, keyed by question text.
 #
-# 12 of the 253 questions share their wording with another row, so this dict
+# 12 of the CSV's 253 rows share their wording with another row, so this dict
 # holds 240 keys rather than 253. That is safe for the breakdown below: every
 # duplicated text that involves an *accepted* question agrees on both type and
 # difficulty, and the single conflicting pair (rows 48 and 156, inferential vs

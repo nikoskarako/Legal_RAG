@@ -71,8 +71,8 @@ rather than direct function calls, so the arrows below are the real dependencies
 │   → data/clusters/              │  │   ├─ rag/interface.py  (Tkinter)   │
 │                                 │  │   └─ api/main.py       (FastAPI)   │
 │ clustering_qa_harvester_*.py    │  │                                    │
-│   representative doc per cluster│  │ rag/chat_cli_ragas_builder.py      │
-│   2-stage gpt-4.1-mini:         │  │   + BGE cross-encoder reranking    │
+│   2-3 docs sampled per cluster  │  │ rag/chat_cli_ragas_builder.py      │
+│   2-stage DeepSeek Chat v3:     │  │   + BGE cross-encoder reranking    │
 │     questions_prompt → 3 Qs     │  │                                    │
 │     answers_prompt   → A + meta │  │ retrieval/run_bm25_eval.py         │
 │   Pydantic-validated            │  │   lexical tsvector retrieval       │
@@ -81,7 +81,7 @@ rather than direct function calls, so the arrows below are the real dependencies
 │   → Google Sheets, human        │  │   RRF fusion of dense + BM25       │
 │     accept/reject               │  │                                    │
 │   → data/qa_pairs/qa_review.json│  │ evaluation/generate_baseline_*.py  │
-│     253 questions, 118 accepted │  │   closed-book, no retrieval        │
+│     254 candidates, 118 accepted│  │   closed-book, no retrieval        │
 └─────────────────────────────────┘  └────────────────────────────────────┘
           │                                    │
           └──────────────┬─────────────────────┘
@@ -118,7 +118,7 @@ src/
 data/
   datasets/           118 scored questions per system (dense/bm25/hybrid/baseline)
   qa_pairs/           generated pairs and the human-reviewed question bank
-  clusters/           36 Louvain clusters over the corpus
+  clusters/           Louvain community assignments over the corpus
 results/              RAGAS scores per system
 docs/                 database setup, Q-A generation process, the LLM prompts used
 ```
@@ -187,9 +187,11 @@ semicolon-delimited file survives only through careful quoting.
 ## Stack
 
 LlamaIndex · PostgreSQL + pgvector · `intfloat/multilingual-e5-base` ·
-BGE cross-encoder reranker · OpenRouter (`deepseek-chat-v3-0324`) ·
-OpenAI (`gpt-4.1-mini`, for Q-A generation and RAGAS judging) · RAGAS ·
-python-louvain · FastAPI · Tkinter
+BGE cross-encoder reranker · RAGAS · python-louvain · FastAPI · Tkinter
+
+Three model roles, kept distinct: **DeepSeek Chat v3** generates the question
+bank; `deepseek-chat-v3-0324` via OpenRouter answers, identically across all four
+systems; OpenAI `gpt-4.1-mini` is the RAGAS judge that scores them.
 
 ## Licence
 

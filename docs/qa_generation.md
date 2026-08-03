@@ -12,20 +12,31 @@ The pipeline is implemented in
 
 Each law is stored in PostgreSQL both as full text and as chunk embeddings. The
 chunk embeddings of a single law are averaged into one document-level vector, a
-cosine k-NN graph is built over those vectors (k=10), and Louvain community
-detection partitions it into clusters. This yielded **36 clusters** over the
-corpus, saved to [`data/clusters/`](../data/clusters).
+cosine k-NN graph is built over those vectors (k=10, edge weights = cosine
+similarity), and Louvain community detection (resolution γ=1.0) is applied to the
+graph's largest connected component. This produced the **35 thematic clusters**
+the benchmark samples from, corresponding to major legal domains — civil,
+criminal, administrative law and so on.
 
 Clustering matters because sampling documents uniformly would over-represent
-whatever topic happens to be most common in the Gazette. One representative per
-cluster — the document closest to its cluster centroid — spreads the questions
-across distinct areas of law.
+whatever topic happens to be most common in the Gazette. Sampling 2–3
+representatives per cluster — those closest to the cluster centroid, subject to a
+minimum length threshold that filters out trivial fragments — spreads the
+questions across distinct areas of law. That gave **85 source documents**.
+
+The community assignments exported by the clustering run are in
+[`data/clusters/`](../data/clusters) (36 files, `cluster_0`–`cluster_35`).
 
 ## 2. Generate questions (LLM call 1)
 
-The representative document's **full text** is sent to `gpt-4.1-mini` with
+The representative document's **full text** is sent to `DeepSeek Chat v3` with
 [`prompts/questions_prompt.txt`](prompts/questions_prompt.txt), asking for three
-questions of varying type and difficulty.
+questions of varying type and difficulty. Three questions across 85 documents
+gives the **254 candidates** that go to review.
+
+(The generator model is configurable — `clustering_qa_harvester_openai_10.py`
+carries `gpt-4.1-mini` as its default, which is the *evaluation* judge, not the
+model used to build the benchmark.)
 
 ## 3. Generate answers and metadata (LLM call 2)
 
@@ -51,13 +62,26 @@ reviewed manually. The result is recorded twice, identically: as
 (what the scripts read) and
 [`qa_review.json`](../data/qa_pairs/qa_review.json).
 
+A single reviewer applied a five-criterion accept/reject guide. A question is
+accepted only if it is answerable from the source document alone, specific rather
+than open-ended, and grounded in what the text explicitly states.
+
 | | Count |
 |---|---|
-| Questions reviewed | 253 |
+| Candidates reviewed | 254 |
 | **Accepted** | **118** |
-| Rejected | 135 |
+| Rejected | 136 |
 
-| | All 253 | | Accepted 118 |
+An acceptance rate of 46.5% is worth noting: more than half of what the generator
+produced was not good enough to evaluate against. The high rejection rate comes
+mostly from the grounding criterion — many generated questions smuggle in
+background knowledge or framing that the source document never states. The 118
+accepted questions are what every system in the results table is scored on.
+
+Distribution of the accepted set, and of the 253 rows present in the exported
+files:
+
+| | Exported rows (253) | | Accepted (118) |
 |---|---|---|---|
 | factual | 183 | | 96 |
 | analytical | 42 | | 15 |
@@ -66,9 +90,10 @@ reviewed manually. The result is recorded twice, identically: as
 | medium | 144 | | 52 |
 | hard | 25 | | 20 |
 
-A 47% acceptance rate is worth noting: more than half of what the generator
-produced was not good enough to evaluate against. The 118 accepted questions are
-what every system in the results table is scored on.
+<sub>The exported CSV and JSON carry 253 rows rather than 254 — one rejected
+question did not make it into the export. Only rejected questions are affected;
+the 118 accepted questions, which are the entire basis of the results, are
+complete and identical in both files.</sub>
 
 Review was also selective in a way that shifts the mix. Inferential questions
 survived least often (7 of 28 accepted, 25%) while hard questions survived most
